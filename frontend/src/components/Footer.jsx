@@ -12,8 +12,8 @@ const Footer = () => {
             mollitia voluptates natus vitae, dignissimos saepe sequi voluptatum.
             Suscipit totam hic magni atque, corporis tempore?
           </p>
-          <h4 className="text-lg font-normal">Email: 6GZDj@example.com</h4>
-          <h4 className="text-lg font-normal">Phone: 1234567890</h4>
+          <h4 className="text-lg font-normal">Email: paraskc@gmail.com</h4>
+          <h4 className="text-lg font-normal">Phone: 9848172677</h4>
         </div>
         {/* second div */}
         <div>
