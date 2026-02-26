@@ -1,19 +1,25 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { StoreContext } from "../context/StoreContext"; // Import context
+
 const Signup = () => {
+  const { API_URL } = useContext(StoreContext); // Use dynamic URL
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     image: null,
   });
+  
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+
   const onChangeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   const fileHandler = (e) => {
     setFormData({ ...formData, image: e.target.files[0] });
   };
@@ -21,27 +27,26 @@ const Signup = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const data = new FormData();
       data.append("name", formData.name);
       data.append("email", formData.email);
       data.append("password", formData.password);
       data.append("image", formData.image);
-      setLoading(true);
+
       const res = await axios.post(
-        "http://localhost:4000/user/register",
-        data,
-        {
-          headers: {
-            "Content-Type": "multipart/formData",
-          },
-        }
+        `${API_URL}/user/register`, // Dynamic URL
+        data
+        // Note: Removed headers; Axios handles 'multipart/form-data' automatically for FormData
       );
+
       if (res.data.success) {
         toast.success(res.data.message);
         navigate("/login");
       }
     } catch (error) {
-      toast.error(error.message);
+      // Show specific error from backend if available
+      toast.error(error.response?.data?.message || error.message);
     } finally {
       setLoading(false);
     }
@@ -84,15 +89,21 @@ const Signup = () => {
             className="w-full p-2 border border-gray-300 rounded outline-none"
             required
           />
-          <input
-            onChange={fileHandler}
-            accept="image/*"
-            type="file"
-            className="w-full p-2 border border-gray-300 rounded outline-none"
-            required
-          />
-          <button className="bg-orange-600 text-white px-6 py-2 w-full cursor-pointer">
-            Signup
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-600">Profile Picture</label>
+            <input
+              onChange={fileHandler}
+              accept="image/*"
+              type="file"
+              className="w-full p-2 border border-gray-300 rounded outline-none"
+              required
+            />
+          </div>
+          <button 
+            disabled={loading}
+            className={`bg-orange-600 text-white px-6 py-2 w-full cursor-pointer hover:bg-orange-700 transition ${loading ? 'opacity-50' : ''}`}
+          >
+            {loading ? "Creating Account..." : "Signup"}
           </button>
         </form>
         <p className="text-center mt-4">
@@ -105,4 +116,5 @@ const Signup = () => {
     </div>
   );
 };
+
 export default Signup;

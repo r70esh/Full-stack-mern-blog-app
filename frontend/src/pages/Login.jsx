@@ -5,25 +5,25 @@ import { toast } from "react-toastify";
 import { StoreContext } from "../context/StoreContext";
 
 const Login = () => {
+  const { loginUser, API_URL } = useContext(StoreContext); // Use API_URL from Context
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  const { loginUser } = useContext(StoreContext);
-  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
   const onChangeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
 
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
       const res = await axios.post(
-        "http://localhost:4000/user/login",
+        `${API_URL}/user/login`, // Dynamic URL
         formData,
         {
           headers: {
@@ -31,7 +31,7 @@ const Login = () => {
           },
         }
       );
-      console.log("res", res);
+      
       if (res.data.success) {
         const { user, token } = res.data;
         loginUser(user, token);
@@ -39,11 +39,14 @@ const Login = () => {
         navigate("/");
       }
     } catch (error) {
-      toast.error(error.message);
+      // Better error messaging from backend
+      const errorMsg = error.response?.data?.message || "Login failed";
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div>
       <div className="w-full bg-pink-200 py-12 mx-auto flex items-center justify-center ">
@@ -74,8 +77,11 @@ const Login = () => {
               required
             />
 
-            <button className="bg-orange-600 text-white px-6 py-2 w-full cursor-pointer">
-              Signin
+            <button 
+              disabled={loading}
+              className={`bg-orange-600 text-white px-6 py-2 w-full cursor-pointer hover:bg-orange-700 transition ${loading ? 'opacity-50' : ''}`}
+            >
+              {loading ? "Logging in..." : "Signin"}
             </button>
           </form>
           <p className="text-center mt-4">
@@ -89,4 +95,5 @@ const Login = () => {
     </div>
   );
 };
+
 export default Login;

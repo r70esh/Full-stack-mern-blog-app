@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+
 const BlogCard = ({
   id,
   title,
@@ -8,12 +9,15 @@ const BlogCard = ({
   author_image,
   date,
 }) => {
+  // Use the Vite environment variable for the backend URL, fallback to localhost
+  const serverUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
   return (
     <div className="border-1 border-gray-300 shadow-md p-3 rounded-md">
       <Link to={`/blog/${id}`}>
         <img
-          src={`http://localhost:4000/images/${image}`}
-          alt=""
+          src={`${serverUrl}/images/${image}`}
+          alt={title}
           className="flex items-center justify-center w-full mx-auto cursor-pointer transform duration-300 hover:scale-105"
         />
       </Link>
@@ -22,8 +26,8 @@ const BlogCard = ({
       <div className="flex gap-3 items-center my-3">
         <img
           className="w-8 h-8 rounded-full"
-          src={`http://localhost:4000/images/${author_image}`}
-          alt=""
+          src={`${serverUrl}/images/${author_image}`}
+          alt={author_name}
         />
         <p className="text-lg font-bold text-gray-600">{author_name}</p>
         <p className="text-lg font-bold text-gray-600">
@@ -37,4 +41,5 @@ const BlogCard = ({
     </div>
   );
 };
+
 export default BlogCard;
