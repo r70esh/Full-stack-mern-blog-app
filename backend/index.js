@@ -8,28 +8,38 @@ import blogRoutes from "./routes/blog.routes.js";
 dotenv.config();
 const app = express();
 
-// middlewares
+// --- MIDDLEWARES ---
 app.use(express.json());
-app.use(cors());
 
-// Health Check Route
+// Updated CORS to allow your specific Vercel URL
+app.use(cors({
+  origin: "https://full-stack-mern-blog-app-cejy.vercel.app", 
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
+// --- HEALTH CHECK ROUTE ---
+// Visiting your Render URL in a browser should show this message
 app.get("/", (req, res) => {
   res.send("API is running successfully!");
 });
 
-// API ENDPOINTS
+// --- API ENDPOINTS ---
 app.use("/images", express.static("uploads"));
 app.use("/user", userRoutes);
 app.use("/blog", blogRoutes);
 
-// Dynamic Port for Render
+// --- SERVER INITIALIZATION ---
+// Render will provide the PORT via process.env.PORT
 const PORT = process.env.PORT || 4000;
 
-// Connect to DB first, then start server
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+// Connect to MongoDB Atlas first, then start listening
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Database connection failed. Server not started.", err);
   });
-}).catch(err => {
-  console.error("Database connection failed", err);
-});
